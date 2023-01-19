@@ -1,0 +1,27 @@
+{
+  "name": "add-sessions",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/app.js",
+    "dev": "nodemon ./src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.0-alpha1",
+    "cookie-parser": "^1.4.6",
+    "eslint": "^8.32.0",
+    "express": "^4.18.2",
+    "express-handlebars": "^6.0.6",
+    "express-session": "^1.17.3",
+    "faker": "^5.5.3",
+    "i": "^0.3.7",
+    "mongoose": "^6.8.4",
+    "morgan": "^1.10.0",
+    "npm": "^9.3.1",
+    "session-file-store": "^1.5.0"
+  }
+}
