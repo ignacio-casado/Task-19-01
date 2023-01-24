@@ -1,7 +1,7 @@
-const { string } = require('i/lib/util')
+
 const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
-mongoose.connect("mongodb//localhost:27017/userForm", {
+mongoose.connect("mongodb://localhost:27017/userForm", {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
