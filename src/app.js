@@ -54,6 +54,7 @@ const sessionChecker = (req, res, next)=>{
         next()
     }
 }
+
 app.get('/', (req,res)=>{
     res.redirect('/login')
 }).post(async(req,res)=>{
@@ -76,7 +77,7 @@ app.route('/login').get((req, res)=>{
 app.route('/signup').get(sessionChecker,(req, res)=>{
     res.sendFile(__dirname + '/public/signup.html')
 }).post((req,res)=>{
-    let user = new User({
+    let user = new user({
         username: req.body.username,
         password: req.body.password
     })
