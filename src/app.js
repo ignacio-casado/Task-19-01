@@ -1,14 +1,10 @@
 
 const express = require('express')
 const morgan = require('morgan')
-const handlebars= require('express-handlebars')
-const router = require('./controller/products.js') 
-const path = require('path')
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
-const fileStore = require('session-file-store')
-const user = require('./models/user.js')
-const { resetWatchers } = require('nodemon/lib/monitor/watch.js')
+const User = require('./models/User.js')
+
 //app
 const app = express();
 
@@ -21,7 +17,7 @@ app.listen(PORT,()=>{
 })
 
 //sessions
-const store = fileStore(session)
+// const store = fileStore(session)
 
 app.use(express.urlencoded({extended: true}))
 app.use(cookieParser())
@@ -47,63 +43,72 @@ morgan.token('host', function(req, res) {
 
 // new routes
 
-const sessionChecker = (req, res, next)=>{
-    if(req.session.user && req.session.user_sid){
+
+const sessionChecker = (req, res, next) => {
+    if (req.session.user && req.cookies.user_sid) {
         res.redirect('/dashboard')
-    }else{
+    } else {
         next()
     }
 }
 
-app.get('/', (req,res)=>{
+app.get('/', sessionChecker, (req, res) => {
     res.redirect('/login')
-}).post(async(req,res)=>{
-    let {username, password} = req.body
-    let user = await user.find({username})
+})
 
-    if(!user){
-        res.redirect('/login')
-    }
-    if(user.password != password){
-        res.redirect('/login')
-    }else{
+// app.get('/login', )
+app.route('/login').get((req, res) => {
+    res.sendFile(__dirname + '/public/login.html')
+}).post(async (req, res) => {
+    let { username, password } = req.body
+
+    try {
+        let user = await User.findOne({ username }).exec()
+        if (!user) {
+            res.redirect('/login')
+        }
+        if (user.password != password) {
+            res.redirect('/login')
+        }
         req.session.user = user
         res.redirect('/dashboard')
+    } catch(err) {
+        console.log(err)
     }
 })
-app.route('/login').get((req, res)=>{
-    res.sendFile(__dirname + '/public/login.html')
-})
-app.route('/signup').get(sessionChecker,(req, res)=>{
+
+app.route('/signup').get(sessionChecker, (req, res) => {
     res.sendFile(__dirname + '/public/signup.html')
-}).post((req,res)=>{
-    let user = new user({
+}).post((req, res) => {
+    let user = new User({
         username: req.body.username,
         password: req.body.password
     })
-    user.save((err, docs)=>{
-        if(err){
+    user.save((err, docs) => {
+        if (err) {
             res.redirect('/signup')
-        }else{
+        } else {
             req.session.user = docs
             res.redirect('/dashboard')
         }
     })
 })
 
-app.get('/dashboard',(req,res)=>{
-    if(req.session.user && req.session.user_sid){
+app.get('/dashboard', (req, res) => {
+    if (req.session.user && req.cookies.user_sid) {
         res.sendFile(__dirname + '/public/dashboard.html')
-    }else{
+    } else {
         res.redirect('/login')
     }
+})
 
-})
-app.get('/logout', (req, res)=>{
-    if(req.session.user && req.session.user_sid){
+app.get('/logout', (req, res) => {
+    if (req.session.user && req.cookies.user_sid) {
         res.clearCookie('user_sid')
-        res.redirect('/login')
-    }else{
+        res.redirect('/')
+    } else {
         res.redirect('/login')
     }
 })
+// console.log(sessionChecker)
+
